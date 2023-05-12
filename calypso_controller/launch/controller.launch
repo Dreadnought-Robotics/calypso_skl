@@ -1,0 +1,14 @@
+<launch>
+  
+  <!-- assumes ds4drv is running -->
+  <node name="joy_node" pkg="joy" type="joy_node">
+  </node>
+
+  <node name="controller" pkg="calypso_controller" type="xbox_controller.py">
+  </node>
+
+  <!-- <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol">
+    <param name="cmd" value="$(find calypso_controller)/scripts/controller.sh"/>
+  </node> -->
+
+</launch>

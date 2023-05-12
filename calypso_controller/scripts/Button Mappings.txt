@@ -1,0 +1,20 @@
+Axes 1: Left Horizontal
+Axes 2: Left Vertical
+Axes 3: Left Trigger
+Axes 4: Right Horizontal
+Axes 5: Right Vertical
+Axes 6: Right Trigger
+Axes 7: Push Buttons Horizontal
+Axes 8: Push Buttons Vertical
+
+Button 1: A
+Button 2: B
+Button 3: X
+Button 4: Y
+Button 5: Left Button
+Button 6: Right Button
+Button 7: Select
+Button 8: Start
+Button 9: Home
+Button 10: Left Stick Button
+Button 11: Right Stick Button
