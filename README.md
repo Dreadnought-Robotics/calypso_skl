@@ -1,2 +1,2 @@
 # calypso_skl
-Package required to operate Calypso_skl 
+Packages required to operate Calypso_skl 
