@@ -1,0 +1,4 @@
+<launch>
+  <node name="bottom_cam" pkg="calypso_camera" type="blue_cam.py" output="screen"/>
+  <node name="front_cam" pkg="calypso_camera" type="lenovo_cam.py" output="screen"/>
+</launch>
