@@ -68,9 +68,7 @@ class pid_gypseas:
     print("roll: ", self.roll.current_position)
     self.gypseas_pid()
     
-  
-  # def Heading_subscriber(self,pose):
-  #   self.heave.final=pose.z
+
 
   def getgyp(self, gypseas):
     self.throttle1 = gypseas.t1

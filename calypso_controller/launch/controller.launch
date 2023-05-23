@@ -9,6 +9,9 @@
 
   <node name="pid_gypseas" pkg="calypso_controller" type="gypseas_control.py">
   </node>
+  
+  <node name="pid_gin" pkg="calypso_controller" type="to_gin.py">
+  </node>
 
   <!-- <node pkg="aliencontrol" type="aliencontrol" name="aliencontrol">
     <param name="cmd" value="$(find calypso_controller)/scripts/controller.sh"/>
