@@ -41,7 +41,7 @@ class pid:
         self.vel.append(vel)
         return self.integrate(self.vel,self.time)
 
-    def getPID(self,feed_forward=False):
+    def getPID(self):
     
         kp=self.k[0];ki=self.k[1];kd=self.k[2]
         pid_i=0
@@ -58,11 +58,6 @@ class pid:
         pid_i = self.integrate(self.error, self.time)
         
         pid_p = kp*error
-
-        if(feed_forward):
-            feedforward = self.current_vel - self.prev_vel
-        else:
-            feedforward=0
         
         try:
             pid_d = kd*(error[-1]-self.error[-2]) 
@@ -80,7 +75,7 @@ class pid:
         time_elapsed=self.time[-1]
 
         if time_elapsed>0:
-            PID = pid_p + pid_i_final + pid_d + feedforward/time_elapsed
+            PID = pid_p + pid_i_final + pid_d
         else:
             PID = pid_p + pid_i_final + pid_d
         self.prev_vel = self.current_vel
@@ -90,7 +85,4 @@ class pid:
         if(PID < -90):
             PID=-90
         
-        if(feed_forward):
-            return PID
-        else:
-            return round(PID)
+        return PID

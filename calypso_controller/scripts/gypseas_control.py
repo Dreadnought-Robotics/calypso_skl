@@ -37,7 +37,7 @@ class pid_gypseas:
   def gypseas_pid(self):
 
     #PID_yaw = PID.getPID(self.yaw,True)
-    PID_roll = PID.getPID(self.roll,True)
+    PID_roll = PID.getPID(self.roll)
 
     print("base_throttle: ", self.throttle1)
 
@@ -59,11 +59,14 @@ class pid_gypseas:
     #self.yaw.time.append(time_elapsed)
     # self.heave.time.append(time_elapsed)
     # self.heave.acc.append(Imu.linear_acceleration.z)
-
-    self.roll.current_vel= Imu.angular_velocity.x
     # self.yaw.current_vel = Imu.angular_velocity.z
     self.roll.current_position,pitch,yaw= PID.convert(Imu.orientation.x,Imu.orientation.y,Imu.orientation.z,Imu.orientation.w)
     # self.heave.current_position = self.heave_temp
+    # self.roll.current_position = 180 - self.roll.current_position
+    if self.roll.current_position < 0:
+      self.roll.current_position = self.roll.current_position + 180
+    else:
+      self.roll.current_position = self.roll.current_position - 180
     #print("current_position : ", self.heave.current_position)
     print("roll: ", self.roll.current_position)
     self.gypseas_pid()
@@ -88,7 +91,7 @@ class pid_gypseas:
   def start(self):
     
     try:
-      IMU = rospy.Subscriber("imu/data", Imu, self.Imu_subscriber)
+      IMU = rospy.Subscriber("/imu/data", Imu, self.Imu_subscriber)
       rospy.spin()
     except:
       print("ros shut down")
