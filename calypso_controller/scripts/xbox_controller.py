@@ -15,7 +15,7 @@ class control:
 		self.publisher_gypseas = rospy.Publisher("/controller/gypseas", gypseas, queue_size=100)
 		self.publisher_dolphins = rospy.Publisher("/rosetta/dolphins", dolphins, queue_size=100)
 		self.publisher_pid_values = rospy.Publisher("/calypso_sim/constants",Quaternion, queue_size=100)
-		# self.rate = rospy.Rate(200)
+		self.rate = rospy.Rate(100000)
 		self.stable_gypseas = 1500
 		self.stable_dolphins=1500
 		self.gypseas_min=1520
@@ -27,8 +27,8 @@ class control:
 		# 1536 to 1800, 1200 to 1464
 
 
-		self.thrust_up_dolphins = interp1d([0, 1],[1535, 1800])
-		self.thrust_down_dolphins = interp1d([-1, 0],[1200, 1465])
+		self.thrust_up_dolphins = interp1d([0, 1],[1500, 1800])
+		self.thrust_down_dolphins = interp1d([-1, 0],[1200, 1500])
 		self.is_locked = False
 		self.kp = 0
 		self.ki = 0
@@ -83,14 +83,19 @@ class control:
 				if (msg.axes[1] > 0 and abs(msg.axes[1]) > self._deadzone ):
 						self.g.t1=self.g.t2 = int(self.thrust_up_gypseas(msg.axes[1]))
 
-				if (msg.axes[1] == 0 and abs(msg.axes[1]) > self._deadzone ):
-						self.g.t1=self.g.t2 = self.stable_gypseas	
+				# if (msg.axes[1] == 0 and abs(msg.axes[1]) > self._deadzone ):
+				# 		self.g.t1=self.g.t2 = self.stable_gypseas	
 				
-				if (msg.axes[1] < 0 and abs(msg.axes[1]) > self._deadzone):
+				elif (msg.axes[1] < 0 and abs(msg.axes[1]) > self._deadzone):
 						self.g.t1 = self.g.t2= int(self.thrust_down_gypseas(msg.axes[1]))
+
+				else:
+					self.g.t1=self.g.t2 = self.stable_gypseas
 
 				if(msg.buttons[7]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
 					self.g.t1 = self.g.t2=0
+
+
 
 			self.publisher_gypseas.publish(self.g)
 				
@@ -98,37 +103,41 @@ class control:
 			#################### dolphins ##########################################################################
 
 			#### yaw hard left - LT ####
-			if(msg.buttons[4]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					
-					self.d.d1=1440 #597 rpm
-					self.d.d2=1560 #592 rpm
 
-			#### yaw hard right- RT ####
-			if(msg.buttons[5]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					
-					self.d.d2=1440 #592 rpm
-					self.d.d1=1560 #597 rpm
+
 			#### stop dolphins ####
 			if(msg.buttons[10]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					
 					self.d.d2=1500 #592 rpm
 					self.d.d1=1500 #597 rpm
 			#### forward ####
 			if msg.axes[4] > 0 and abs(msg.axes[4]) > self._deadzone:
 					self.d.d1 = self.d.d2 = int(self.thrust_up_dolphins(msg.axes[4]))
-
-			if msg.axes[4] == 0 and abs(msg.axes[4]) > self._deadzone:
-					self.d.d1 = self.d.d2 = 1500
 			
 			#### backward ####
-			if msg.axes[4] < 0 and abs(msg.axes[4]) > self._deadzone:
+			elif msg.axes[4] < 0 and abs(msg.axes[4]) > self._deadzone:
 					self.d.d1 = self.d.d2 = int(self.thrust_down_dolphins(msg.axes[4]))
+
+			else:
+				self.d.d1 = self.d.d2 = 1500
 
 			#### turn ####
 			if msg.axes[3] and abs(msg.axes[3]) > self._deadzone:
 				self.d.d1 = self.d.d1 - int(self.yaw_left(msg.axes[3]))
 				self.d.d2 = self.d.d1 + int(self.yaw_left(msg.axes[3]))	
 			
+			if(msg.buttons[4]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+					while self.d.d1>1440 and self.d.d2<1560:
+						self.d.d1=self.d.d1 - 1 #597 rpm
+						self.d.d2=self.d.d2 + 1 #592 rpm
+						self.publisher_dolphins.publish(self.d)
+
+			#### yaw hard right- RT ####
+			if(msg.buttons[5]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+					while self.d.d2>1440 and self.d.d1<1560:
+						self.d.d2=self.d.d2 - 1 #597 rpm
+						self.d.d1=self.d.d1 + 1 #592 rpm
+						self.publisher_dolphins.publish(self.d)
+					
 			self.publisher_dolphins.publish(self.d)
 			#########################################################################################################
 			############### Kp Ki Kd    #############################################################################
@@ -147,7 +156,7 @@ class control:
 			self.q.z = self.kd
 			self.q.w = 0.0
 			self.publisher_pid_values.publish(self.q)
-			# self.rate.sleep()
+			self.rate.sleep()
 		else:
 			print("no connection") 
 		
