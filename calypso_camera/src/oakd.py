@@ -1,4 +1,3 @@
-#!usr/bin/env python3
 import cv2
 import depthai
 import rospy
@@ -46,5 +45,4 @@ def publish_rgb_topic():
 
 
 if __name__ == '__main__':
-    rospy.init_node("oakdnode")
     publish_rgb_topic()
