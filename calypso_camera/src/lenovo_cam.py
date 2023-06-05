@@ -8,7 +8,7 @@ rospy.init_node('forward_camera_publisher')
 
 image_pub = rospy.Publisher('/calypso/lenovo_cam', CompressedImage, queue_size=10)
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 while not rospy.is_shutdown():
     ret, frame = cap.read()
