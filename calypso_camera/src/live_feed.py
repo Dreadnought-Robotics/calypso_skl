@@ -6,7 +6,8 @@ import numpy as np
 class live:
     def __init__(self) :
         rospy.init_node('camera_feed_viewer')
-        rospy.Subscriber('/calypso/lenovo_cam', CompressedImage, self.image_callback1)
+        # rospy.Subscriber('/calypso/oakd_image', CompressedImage, self.image_callback1)
+        rospy.Subscriber('/calypso/lenovo_cam', CompressedImage, self.image_callback2)
         rospy.Subscriber('/calypso/bottom_cam', CompressedImage, self.image_callback2)
         self.image1 =  0
         self.image2 = 0
