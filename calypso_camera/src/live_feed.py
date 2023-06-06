@@ -13,35 +13,13 @@ class live:
         rospy.Subscriber('/calypso/bottom_cam', CompressedImage, self.image_callback2)
         self.image1 =  0
         self.image2 = 0
-        self.ARUCO_DICT = {
-            "DICT_4X4_50": cv2.aruco.DICT_4X4_50,
-            "DICT_4X4_100": cv2.aruco.DICT_4X4_100,
-            "DICT_4X4_250": cv2.aruco.DICT_4X4_250,
-            "DICT_4X4_1000": cv2.aruco.DICT_4X4_1000,
-            "DICT_5X5_50": cv2.aruco.DICT_5X5_50,
-            "DICT_5X5_100": cv2.aruco.DICT_5X5_100,
-            "DICT_5X5_250": cv2.aruco.DICT_5X5_250,
-            "DICT_5X5_1000": cv2.aruco.DICT_5X5_1000,
-            "DICT_6X6_50": cv2.aruco.DICT_6X6_50,
-            "DICT_6X6_100": cv2.aruco.DICT_6X6_100,
-            "DICT_6X6_250": cv2.aruco.DICT_6X6_250,
-            "DICT_6X6_1000": cv2.aruco.DICT_6X6_1000,
-            "DICT_7X7_50": cv2.aruco.DICT_7X7_50,
-            "DICT_7X7_100": cv2.aruco.DICT_7X7_100,
-            "DICT_7X7_250": cv2.aruco.DICT_7X7_250,
-            "DICT_7X7_1000": cv2.aruco.DICT_7X7_1000,
-            "DICT_ARUCO_ORIGINAL": cv2.aruco.DICT_ARUCO_ORIGINAL,
-            "DICT_APRILTAG_16h5": cv2.aruco.DICT_APRILTAG_16h5,
-            "DICT_APRILTAG_25h9": cv2.aruco.DICT_APRILTAG_25h9,
-            "DICT_APRILTAG_36h10": cv2.aruco.DICT_APRILTAG_36h10,
-            "DICT_APRILTAG_36h11": cv2.aruco.DICT_APRILTAG_36h11
-        }
-        aruco_type = "DICT_ARUCO_ORIGINAL"
 
-        self.arucoDict = cv2.aruco.getPredefinedDictionary(self.ARUCO_DICT[aruco_type])
+        aruco_type = cv2.aruco.DICT_ARUCO_ORIGINAL
+
+        self.arucoDict = cv2.aruco.getPredefinedDictionary(aruco_type)
 
         self.arucoParams = cv2.aruco.DetectorParameters()
-
+        self.detector = cv2.aruco.ArucoDetector(self.arucoDict, self.arucoParams)
         self.arr = []
 
     def distance(self, ptX1, ptY1, ptX2, ptY2):
@@ -114,7 +92,7 @@ class live:
             cv2.line(self.image1, (628, 361), (457, 291), (0, 255, 255), 3)
             cv2.line(self.image1, (457, 291), (210, 291), (0, 0, 255), 3)
 
-            cv2.imshow("Front_feed", self.image1)
+            cv2.imshow("Bottom_feed", self.image1)
 
             corners, ids, rejected = cv2.aruco.detectMarkers(self.image2, self.arucoDict, parameters=self.arucoParams)
 
@@ -123,7 +101,7 @@ class live:
             if marker_id > 0 and self.arr.count(marker_id)==0 and marker_id<100:
                 self.arr.append(marker_id)
                 print(f"Detected {marker_id}")
-            cv2.imshow("Bottom_feed", detected_markers)
+            cv2.imshow("Front_feed", detected_markers)
             cv2.waitKey(1)
 
         print(self.arr)

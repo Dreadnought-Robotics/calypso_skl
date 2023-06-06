@@ -5,6 +5,7 @@ from calypso_msgs.msg import dolphins
 from scipy.interpolate import interp1d
 from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import Joy
+from std_msgs.msg import Int8
 
 class control:
 	
@@ -14,9 +15,10 @@ class control:
 
 		self.publisher_gypseas = rospy.Publisher("/rosetta/gypseas", gypseas, queue_size=100)
 		self.publisher_dolphins = rospy.Publisher("/rosetta/dolphins", dolphins, queue_size=100)
-		self.publisher_pid_values = rospy.Publisher("/calypso_sim/constants",Quaternion, queue_size=100)
-		self.autonomy_publisher = rospy.Publisher("/calypso/autonomy",bool, queue_size=10) 
+		# self.publisher_pid_values = rospy.Publisher("/calypso_sim/constants",Quaternion, queue_size=100)
+		self.camera_switcher = rospy.Publisher("/calypso/camera_switch", Int8, queue_size=10) 
 		self.rate = rospy.Rate(100000)
+		self.camera_switch = 0
 		self.stable_gypseas = 1500
 		self.stable_dolphins=1500
 		self.gypseas_min=1520
@@ -29,7 +31,7 @@ class control:
 
 
 		self.thrust_up_dolphins = interp1d([0, 1],[1500, 1650])
-		self.thrust_down_dolphins = interp1d([-1, 0],[1450, 1500])
+		self.thrust_down_dolphins = interp1d([-1, 0],[1350, 1500])
 		self.is_locked = False
 		self.kp = 0
 		self.ki = 0
@@ -37,11 +39,12 @@ class control:
 		self.last_gypseas=0
 		self.q1=Quaternion()
 		self.q1.x=self.q1.y=self.q1.z=self.q1.w =0
-		self.publisher_pid_values.publish(self.q1)
+		# self.publisher_pid_values.publish(self.q1)
 		self.g = gypseas()
 		self.d = dolphins()
 		self.q = Quaternion()
-		self.autonomy = False
+		self.front_cam = False
+		self.bottom_cam = False
 	#def load_mappings(self, ns):
         	#axes_remap = rospy.get_param(ns + "/axes", [])
         	#rospy.loginfo("loaded remapping: %d buttons, %d axes" % (len(btn_remap), len(axes_remap)))
@@ -75,6 +78,18 @@ class control:
 			# 	self.autonomy_publisher.publish(self.autonomy)
 
 			# else:
+				if (msg.buttons[0] == 1):
+					self.bottom_cam = True
+					self.front_cam = False
+				if (msg.buttons[1] == 1):
+					self.front_cam = True
+					self.bottom_cam = False
+				
+				if self.bottom_cam:
+					self.camera_switch = 0
+				if self.front_cam:
+					self.camera_switch = 1
+				self.camera_switcher.publish(self.camera_switch)
 				###################################################################################################
 				#################### toggle button / gypseas ######################################################
 
@@ -150,20 +165,20 @@ class control:
 				#########################################################################################################
 				############### Kp Ki Kd    #############################################################################
 				#Kp - Button A
-				if(msg.buttons[0]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					self.kp+=0.1
-				#Ki - Button - B
-				if(msg.buttons[1]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					self.ki+=0.1
-				#Kd - Button Y
-				if(msg.buttons[3]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
-					self.kd+=0.1
+				# if(msg.buttons[0]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+				# 	self.kp+=0.1
+				# #Ki - Button - B
+				# if(msg.buttons[1]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+				# 	self.ki+=0.1
+				# #Kd - Button Y
+				# if(msg.buttons[3]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+				# 	self.kd+=0.1
 				
-				self.q.x = self.kp
-				self.q.y = self.ki
-				self.q.z = self.kd
-				self.q.w = 0.0
-				self.publisher_pid_values.publish(self.q)
+				# self.q.x = self.kp
+				# self.q.y = self.ki
+				# self.q.z = self.kd
+				# self.q.w = 0.0
+				# self.publisher_pid_values.publish(self.q)
 				# self.rate.sleep()
 		else:
 			print("no connection") 
