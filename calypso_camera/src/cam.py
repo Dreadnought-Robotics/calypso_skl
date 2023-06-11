@@ -21,39 +21,32 @@ class camThread(threading.Thread):
     def run(self):
         print("Starting " + self.previewName)
         if self.thread_flag == 0:
+            image_pub1 = rospy.Publisher("/calypso/lenovo_cam", Image, queue_size=10)
+            image_pub2 = rospy.Publisher("/calypso/bottom_cam", Image, queue_size=10)
+            bridge = CvBridge()
+            image_msg1 = Image()
+            image_msg2 = Image()
             global switch_flag
             while not rospy.is_shutdown():
                 if switch_flag==0:
-                    camPreview(self.previewName, 0, "/calypso/lenovo_cam", 0)
+                    cap = cv2.VideoCapture(0)
+                    while not rospy.is_shutdown():
+                        ret, frame = cap.read()
+                        if ret:
+                            image_msg1 = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+                            image_pub1.publish(image_msg1)
+                            image_pub2.publish(image_msg2)
                 elif switch_flag==1:
-                    camPreview(self.previewName, 2, "/calypso/bottom_cam", 2)
+                    cap = cv2.VideoCapture(0)
+                    while not rospy.is_shutdown():
+                        ret, frame = cap.read()
+                        if ret:
+                            image_msg2 = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+                            image_pub1.publish(image_msg1)
+                            image_pub2.publish(image_msg2)
         elif self.thread_flag == 1:
             switch_subscriber = rospy.Subscriber("/calypso/camera_switch", Int8, switch_callback)
 
-def camPreview(previewName, camID, topicName, check):
-    global switch_flag
-    image_pub = rospy.Publisher(topicName, Image, queue_size=10)
-
-    bridge = CvBridge()
-
-    cap = cv2.VideoCapture(camID)  # 0 represents the default camera, change it to a different index if necessary
-
-    # Start the video capture loop
-    while not rospy.is_shutdown():
-        ret, frame = cap.read()
-
-        # Convert the OpenCV frame to a ROS image message
-        if ret:
-            image_msg = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
-            # print(switch_flag)
-
-            # Publish the ROS image message
-            image_pub.publish(image_msg)
-        
-        if switch_flag != check:
-            break
-
-    cap.release()
 
 # Create two threads as follows
 rospy.init_node('calypso_cams', anonymous=True)
