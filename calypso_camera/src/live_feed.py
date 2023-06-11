@@ -5,6 +5,7 @@ from sensor_msgs.msg import Image
 import cv2
 import numpy as np
 import math
+from cv_bridge import CvBridge
 
 class live:
     def __init__(self) :
@@ -85,6 +86,10 @@ class live:
         self.image2 = cv2.resize(self.image2, (width//2, height//2), interpolation=cv2.INTER_CUBIC)
         # print(type(self.image2))
     def subscribe_and_view_feed(self):
+
+        bridge = CvBridge()
+        image1_pub = rospy.Publisher("/calypso/front/aruco", Image, queue_size=10)
+        image2_pub = rospy.Publisher("/calypso/bottom/aruco", Image, queue_size=10)
         
         while not rospy.is_shutdown():
 
@@ -101,7 +106,8 @@ class live:
             if marker_id > 0 and self.arr.count(marker_id)==0 and marker_id<100:
                 self.arr.append(marker_id)
                 print(f"Detected {marker_id}")
-            cv2.imshow("Front_feed", detected_markers)
+            image_msg = bridge.cv2_to_imgmsg(detected_markers, encoding="bgr8")
+            image1_pub.publish(image_msg)
 
             corners, ids, rejected = cv2.aruco.detectMarkers(self.image1, self.arucoDict, parameters=self.arucoParams)
 
@@ -110,7 +116,8 @@ class live:
             if marker_id > 0 and self.arr.count(marker_id)==0 and marker_id<100:
                 self.arr.append(marker_id)
                 print(f"Detected {marker_id}")
-            cv2.imshow("Bottom_feed", detected_markers)
+            image_msg = bridge.cv2_to_imgmsg(detected_markers, encoding="bgr8")
+            image2_pub.publish(image_msg)
 
             cv2.waitKey(1)
 
