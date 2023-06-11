@@ -4,9 +4,9 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
 
-rospy.init_node('calypso_lenovo', anonymous=True)
+rospy.init_node('calypso_bottom', anonymous=True)
 
-image_pub = rospy.Publisher('calypso/lenovo_cam', Image, queue_size=10)
+image_pub = rospy.Publisher('calypso/bottom_cam', Image, queue_size=10)
 
 bridge = CvBridge()
 
