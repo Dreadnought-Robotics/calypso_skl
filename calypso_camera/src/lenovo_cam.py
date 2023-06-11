@@ -10,16 +10,17 @@ image_pub = rospy.Publisher('calypso/lenovo_cam', Image, queue_size=10)
 
 bridge = CvBridge()
 
-cap = cv2.VideoCapture(0)  # 0 represents the default camera, change it to a different index if necessary
+cap = cv2.VideoCapture(2)  # 0 represents the default camera, change it to a different index if necessary
 
 # Start the video capture loop
 while not rospy.is_shutdown():
     ret, frame = cap.read()
 
     # Convert the OpenCV frame to a ROS image message
-    image_msg = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+    if ret:
+        image_msg = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
 
-    # Publish the ROS image message
-    image_pub.publish(image_msg)
+        # Publish the ROS image message
+        image_pub.publish(image_msg)
 
 cap.release()

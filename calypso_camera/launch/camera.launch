@@ -1,3 +1,5 @@
 <launch>
-  <node name="front_cam" pkg="calypso_camera" type="lenovo_cam.py" output="screen"/>
+  <node name="calypso_lenovo" pkg="calypso_camera" type="lenovo_cam.py" output="screen"/>
+  <node name="calypso_bottom" pkg="calypso_camera" type="lenovo_cam.py" output="screen"/>
+  <node name="camera_feed_viewer" pkg="calypso_camera" type="live_feed.py" output="screen"/>
 </launch>

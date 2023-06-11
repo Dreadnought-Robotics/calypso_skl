@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 import rospy
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 import cv2
 import numpy as np
 import math
@@ -9,10 +9,10 @@ import math
 class live:
     def __init__(self) :
         rospy.init_node('camera_feed_viewer')
-        rospy.Subscriber('/calypso/lenovo_cam', CompressedImage, self.image_callback1)
-        rospy.Subscriber('/calypso/bottom_cam', CompressedImage, self.image_callback2)
-        self.image1 =  0
-        self.image2 = 0
+        rospy.Subscriber('/calypso/lenovo_cam', Image, self.image_callback1)
+        rospy.Subscriber('/calypso/bottom_cam', Image, self.image_callback2)
+        self.image1 =  Image()
+        self.image2 = Image()
 
         aruco_type = cv2.aruco.DICT_ARUCO_ORIGINAL
 
@@ -88,11 +88,11 @@ class live:
         
         while not rospy.is_shutdown():
 
-            cv2.line(self.image1, (15, 361), (210, 291), (0, 255, 255), 3)
-            cv2.line(self.image1, (628, 361), (457, 291), (0, 255, 255), 3)
-            cv2.line(self.image1, (457, 291), (210, 291), (0, 0, 255), 3)
+            # cv2.line(self.image1, (15, 361), (210, 291), (0, 255, 255), 3)
+            # cv2.line(self.image1, (628, 361), (457, 291), (0, 255, 255), 3)
+            # cv2.line(self.image1, (457, 291), (210, 291), (0, 0, 255), 3)
 
-            cv2.imshow("Bottom_feed", self.image1)
+            # cv2.imshow("Bottom_feed", self.image1)
 
             corners, ids, rejected = cv2.aruco.detectMarkers(self.image2, self.arucoDict, parameters=self.arucoParams)
 
@@ -102,6 +102,16 @@ class live:
                 self.arr.append(marker_id)
                 print(f"Detected {marker_id}")
             cv2.imshow("Front_feed", detected_markers)
+
+            corners, ids, rejected = cv2.aruco.detectMarkers(self.image1, self.arucoDict, parameters=self.arucoParams)
+
+            detected_markers, marker_id = self.aruco_display(corners, ids, rejected, self.image1)
+
+            if marker_id > 0 and self.arr.count(marker_id)==0 and marker_id<100:
+                self.arr.append(marker_id)
+                print(f"Detected {marker_id}")
+            cv2.imshow("Bottom_feed", detected_markers)
+
             cv2.waitKey(1)
 
         print(self.arr)

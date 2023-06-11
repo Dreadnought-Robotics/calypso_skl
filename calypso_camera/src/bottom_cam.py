@@ -17,9 +17,10 @@ while not rospy.is_shutdown():
     ret, frame = cap.read()
 
     # Convert the OpenCV frame to a ROS image message
-    image_msg = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
+    if ret:
+        image_msg = bridge.cv2_to_imgmsg(frame, encoding="bgr8")
 
-    # Publish the ROS image message
-    image_pub.publish(image_msg)
+        # Publish the ROS image message
+        image_pub.publish(image_msg)
 
 cap.release()
