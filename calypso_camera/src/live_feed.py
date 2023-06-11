@@ -83,7 +83,7 @@ class live:
         width = 1000
         height = int(width*(h/w))
         self.image2 = cv2.resize(self.image2, (width//2, height//2), interpolation=cv2.INTER_CUBIC)
-
+        # print(type(self.image2))
     def subscribe_and_view_feed(self):
         
         while not rospy.is_shutdown():
