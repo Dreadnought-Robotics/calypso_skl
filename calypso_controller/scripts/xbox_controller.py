@@ -115,6 +115,20 @@ class control:
 					else:
 						self.g.t1=self.g.t2 = self.last_gypseas = self.stable_gypseas
 
+
+if(msg.buttons[4]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+						while self.d.d1>1440 and self.d.d2<1560:
+							self.g.t1=self.g.t1 - 1 #597 rpm
+							self.g.t2=self.g.t2 + 1 #592 rpm
+							self.publisher_gypseas.publish(self.g)
+
+				#### yaw hard right- RT ####
+				if(msg.buttons[5]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
+						while self.d.d2>1440 and self.d.d1<1560:
+							self.g.t2=self.g.t2 - 1 #597 rpm
+							self.g.t1=self.g.t1 + 1 #592 rpm
+							self.publisher_gypseas.publish(self.g)
+
 					if(msg.buttons[7]== 1 and -self._deadzone<msg.axes[4]<self._deadzone):
 						self.g.t1 = self.g.t2=0
 
